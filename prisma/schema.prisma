@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  username String
+  email    String   @unique
+  password String
+  files    Data[]
+  folders  Folder[]
+}
+
+model Data {
+  id         String   @id @default(uuid())
+  name       String
+  size       Int
+  createdAt  DateTime @default(now())
+  uploadedAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  folderId String?
+  folder   Folder? @relation(fields: [folderId], references: [id])
+
+  @@index([userId]) // Index to speed up queries filtering 
+}
+
+model Folder {
+  id         String   @id @default(uuid())
+  name       String
+  createdAt  DateTime @default(now())
+  uploadedAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  files Data[]
+
+  @@unique([userId, name]) // Prevent same user from having duplicate folder names
+  @@index([userId]) // Index to speed up queries filtering by folderId
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}

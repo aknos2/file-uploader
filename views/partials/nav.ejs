@@ -1,0 +1,19 @@
+ <nav>
+    <div class="logo">
+      <a href="/"><h1>File Uploader</h1></a>
+    </div>
+      <ul>
+        <% if (locals.user) {%>
+          <div class="username">
+            <p><%= user.username %></p>
+            <span class="material-symbols-outlined">
+            account_circle
+            </span>
+          </div>
+        <% } else {%>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/sign-up">Sign Up</a></li>
+        <% } %>       
+        <li><a href="/library">Library</a></li>
+      </ul>
+  </nav>

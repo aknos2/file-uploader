@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ('partials/head.ejs') %>
+</head>
+<body>
+  <%- include ('partials/nav.ejs')%>
+
+  <div class="centering-wrapper">
+    <div class="login-container">
+      <h1>Login</h1>
+
+      <div class="error">
+        <%- include("partials/errors.ejs") %>
+      </div>
+      <% if (successMessage) { %>
+       <div class="success"><%= successMessage %></div>
+      <% } %>
+
+      <form action="/login" method="POST">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p>Don't have an account? <a href="/sign-up">Sign up here</a></p>
+    </div>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,200 @@
+:root {
+  --accessBtnColor: rgb(73, 73, 213);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 20px auto 0px auto;
+}
+
+p, h1, h2, h3, a, ul {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: #222;
+}
+
+button {
+  border: none;
+  border-radius: 5px;
+  height: 35px;
+  color: whitesmoke;
+}
+
+.title {
+  margin: 0 auto;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid gray;
+  gap: 10px;
+  position: relative;
+  padding: 0 20px;
+  max-height: 10vh;
+  padding-bottom: 10px;
+}
+
+nav ul {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+nav li{
+  list-style-type: none;
+}
+
+nav p, nav a{
+  color: #000000;
+  font-weight: 300;
+}
+
+.centering-wrapper {
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container, 
+.signup-container {
+  border: 1px solid black;
+  border-radius: 2px;
+  width: 450px;
+  padding: 30px 70px;
+  margin: 0 auto;
+}
+.login-container h1, 
+.signup-container h1 {
+  text-align: center;
+}
+.login-container form, 
+.signup-container form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.login-container label,
+.signup-container label {
+  margin-top: 10px;
+}
+.signup-container label > span {
+  font-size: 0.7rem;
+}
+.login-container input,
+.signup-container input {
+  padding: 5px;
+  font-family: inherit;
+}
+.login-container button,
+.signup-container button {
+  margin-top: 20px;
+  font-family: inherit;
+  padding: 5px;
+  font-weight: bold;
+  background-color: var(--accessBtnColor);
+}
+.login-container p {
+  float: right;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+.login-container a {
+  color: blue;
+  text-decoration: underline;
+}
+
+.library-container  {
+  display: flex;
+  flex-direction: row;
+  height: 87vh;
+}
+.library-container .content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid black;
+}
+.library-container .sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: none;
+  border-left: 1px solid black;
+  max-height: 100%;
+  margin: 0;
+  max-width: 100px;
+  position: relative;
+  padding: 20px;
+  background-color: #f8f8f8;
+  color: #000000;
+}
+.library-container .sidebar button {
+  color: #000000;
+}
+.library-container .sidebar .logout {
+  position: absolute;
+  bottom: 0;
+  transform:translateY(-50px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.error {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+.error li {
+  color: red;
+  font-size: 0.9rem;
+  line-height: 1.3rem;
+}
+.success {
+  color: green;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  padding-top: 10px;
+}
+
+.username {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  transform: translateY(-3px);
+}
+.material-symbols-outlined {
+  color: #252121;
+}
+
+.card {
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  padding: 10px 10px;
+}
+.card:last-child {
+  border-radius: 0 0 5px 5px;
+}
+.card.category {
+  background-color: rgb(170, 180, 105);
+  border-top: 1px solid black;
+  border-radius: 5px 5px 0 0;
+  font-weight: 550;
+}
+.card ul{
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+.card li {
+  list-style-type: none;
+}

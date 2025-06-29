@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ('partials/head.ejs') %>
+</head>
+<body>
+  <%- include ('partials/nav.ejs')%>
+
+  <main>
+    <div class="library-container">      
+      <div class="content">
+        <% if (locals.user && allFiles.length > 0) {%>
+          <div class="card category">
+            <ul>
+                <li id="name">Name</li>
+                <li id="size">Size</li>
+                <li id="created">Created</li>
+                <li id="modified">Date modified</li>
+              </ul>
+          </div>
+          <% allFiles.forEach((file) => { %> 
+            <div class="card">
+              <ul>
+                <li><%= file.name %></li>
+                <li><%= file.size %></li>
+                <li><%= file.createdAt %></li>
+                <li><%= file.uploadedAt %></li>
+              </ul>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No files uploaded yet.</p>
+        <% } %>%>
+      </div>
+       <%- include ('partials/sidebar.ejs') %>
+    </div>
+  </main>
+
+
+</body>
+</html>

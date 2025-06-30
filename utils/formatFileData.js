@@ -1,6 +1,6 @@
 import { format, formatDistanceToNow, differenceInDays, differenceInCalendarDays } from 'date-fns';
 
-export function formatMessageDates(data) {
+export function formatFileData(data) {
   return data.map(file => {
     const createdAtDate = new Date(file.createdAt);
     const uploadedAtDate = new Date(file.uploadedAt);
@@ -17,6 +17,23 @@ export function formatMessageDates(data) {
         uploadedDaysAgo <= 3
           ? formatDistanceToNow(uploadedAtDate, { addSuffix: true }) 
           : format(uploadedAtDate, 'MMM dd, yyyy'),
+      size: formatFileSize(file.size),
     };
   });
+}
+
+function formatFileSize(bytes) {
+  const kb = bytes / 1024;
+  const mb = kb / 1024;
+  const gb = mb / 1024;
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  } else if (kb < 1024) {
+    return `${kb.toFixed(2)} KB`;
+  } else if (mb < 1024) {
+    return `${mb.toFixed(2)} MB`;
+  } else {
+    return `${gb.toFixed(2)} GB`;
+  }
 }

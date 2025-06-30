@@ -23,6 +23,7 @@ model Data {
   size       Int
   createdAt  DateTime @default(now())
   uploadedAt DateTime @default(now())
+  type       String   @default("file")
 
   userId String
   user   User   @relation(fields: [userId], references: [id])

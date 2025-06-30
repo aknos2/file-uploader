@@ -15,8 +15,8 @@ import './config/passport.js';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 const app = express();
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +25,7 @@ app.set('view engine', 'ejs');
 // Middleware
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
+app.use('/uploads', express.static('uploads'));
 
 // PostgreSQL + Prisma
 app.use(

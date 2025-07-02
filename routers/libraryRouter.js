@@ -16,7 +16,7 @@ libraryRouter.get("/log-out", (req, res, next) => {
   });
 });
 libraryRouter.get('/folder/:id', viewFolderHandler);
-libraryRouter.post('/upload', resolveFolderName, upload.single('file'), uploadFileHandler);
+libraryRouter.post('/upload', upload.single('file'), resolveFolderName, uploadFileHandler);
 libraryRouter.post('/create-folder', createFolderHandler);
 libraryRouter.post('/:id/delete', deleteFileHandler);
 libraryRouter.post('/folder/:id/delete', deleteFolderHandler);

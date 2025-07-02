@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Folder" ADD COLUMN     "size" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "type" TEXT NOT NULL DEFAULT 'folder';

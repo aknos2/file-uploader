@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { storage } from '../utils/multerStorage.js';
-import { deleteFileHandler, displayAllFilesHandler, uploadFileHandler } from '../controllers/libraryController.js';
+import { deleteFileHandler, displayAllFilesHandler, uploadFileHandler, createFolderHandler, resolveFolderName, viewFolderHandler, deleteFolderHandler } from '../controllers/libraryController.js';
 import path from 'path';
 import { __dirname } from '../app.js';
 
@@ -15,8 +15,11 @@ libraryRouter.get("/log-out", (req, res, next) => {
     res.redirect("/");
   });
 });
-libraryRouter.post('/upload', upload.single('file'), uploadFileHandler);
+libraryRouter.get('/folder/:id', viewFolderHandler);
+libraryRouter.post('/upload', resolveFolderName, upload.single('file'), uploadFileHandler);
+libraryRouter.post('/create-folder', createFolderHandler);
 libraryRouter.post('/:id/delete', deleteFileHandler);
+libraryRouter.post('/folder/:id/delete', deleteFolderHandler);
 libraryRouter.get('/download/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'uploads', req.params.filename);
   res.download(filePath, err => {

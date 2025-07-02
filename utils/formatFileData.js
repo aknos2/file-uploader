@@ -22,6 +22,32 @@ export function formatFileData(data) {
   });
 }
 
+export function formatFolderData(folders) {
+  return folders.map(folder => {
+    const createdAtDate = new Date(folder.createdAt);
+    const uploadedAtDate = new Date(folder.uploadedAt || folder.createdAt);
+    const createdDaysAgo = differenceInCalendarDays(new Date(), createdAtDate);
+    const uploadedDaysAgo = differenceInDays(new Date(), uploadedAtDate);
+
+    return {
+      ...folder,
+      createdAt:
+        createdDaysAgo <= 3
+          ? `${createdDaysAgo === 0 ? 'Today' : `${createdDaysAgo} day${createdDaysAgo > 1 ? 's' : ''} ago`}`
+          : format(createdAtDate, 'MMM dd, yyyy'),
+      uploadedAt:
+        uploadedDaysAgo <= 3
+          ? formatDistanceToNow(uploadedAtDate, { addSuffix: true }) 
+          : format(uploadedAtDate, 'MMM dd, yyyy'),
+      size: formatFileSize(folder.size),
+
+      // format files inside the folder
+      data: formatFileData(folder.data || [])
+    };
+  });
+}
+
+
 function formatFileSize(bytes) {
   const kb = bytes / 1024;
   const mb = kb / 1024;

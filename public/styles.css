@@ -130,7 +130,7 @@ nav p, nav a{
   border-left: 1px solid black;
   max-height: 100%;
   margin: 0;
-  max-width: 100px;
+  max-width: 200px;
   position: relative;
   padding: 20px;
   background-color: #f8f8f8;
@@ -139,14 +139,30 @@ nav p, nav a{
 .library-container .sidebar button {
   color: #000000;
 }
+.library-container .sidebar svg {
+  width: 80px;
+  height: 30px
+}
 .library-container .sidebar .logout {
   position: absolute;
   bottom: 0;
   transform:translateY(-50px);
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+}
+.library-container .selected-folder {
+    outline: 2px solid #007BFF;
+    background-color: #e6f0ff;
+}
+.library-container .folder-link {
+  text-decoration: none;
+  color: inherit;
+}
+.folder-link:hover {
+  background-color: #965656;
 }
 
 .error {
@@ -170,10 +186,18 @@ nav p, nav a{
   display: flex;
   gap: 2px;
   align-items: center;
-  transform: translateY(-3px);
 }
 .material-symbols-outlined {
   color: #252121;
+}
+.library-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.library-link p{
+  display: flex;
+  align-items: center;
 }
 
 .card {
@@ -181,9 +205,7 @@ nav p, nav a{
   border-left: 1px solid black;
   border-right: 1px solid black;
   padding: 10px 10px ;
-}
-.card:last-child {
-  border-radius: 0 0 5px 5px;
+  overflow: auto;
 }
 .card.category {
   background-color: rgb(170, 180, 105);
@@ -210,4 +232,81 @@ nav p, nav a{
 }
 .card .tools .delete-btn {
   margin-right: auto;
+}
+
+.folder-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.folder-head a{
+  font-size: 1.5rem;
+}
+.folder-head a:hover{
+  color: #c9b647;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-window {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-window h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.modal-window input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 1rem 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.hidden {
+  display: none;
+}
+
+
+@media (max-width: 878px) {
+  .card ul {
+    display: grid;
+    grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(60px, 0.5fr);
+    gap: 10px;
+    align-items: center;
+  }
+
+  .card li:first-child {
+    list-style-type: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 2px 5px;
+  }
+  .library-container .sidebar svg {
+    width: 30px;
+    height: 30px
+  }
+  .library-container .sidebar .logout {
+    transform:translateY(-50px);
+  }
 }

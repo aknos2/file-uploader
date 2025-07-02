@@ -21,9 +21,9 @@ model Data {
   id         String   @id @default(uuid())
   name       String
   size       Int
+  type       String   @default("file")
   createdAt  DateTime @default(now())
   uploadedAt DateTime @default(now())
-  type       String   @default("file")
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -37,13 +37,15 @@ model Data {
 model Folder {
   id         String   @id @default(uuid())
   name       String
+  size       Int      @default(0)
   createdAt  DateTime @default(now())
   uploadedAt DateTime @default(now())
+  type       String   @default("folder")
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  files Data[]
+  data Data[]
 
   @@unique([userId, name]) // Prevent same user from having duplicate folder names
   @@index([userId]) // Index to speed up queries filtering by folderId

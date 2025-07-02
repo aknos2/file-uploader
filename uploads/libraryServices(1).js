@@ -18,17 +18,20 @@ export async function createFolder(name, userId) {
   return folder;
 }
 
+
 export async function findFolderByName(name) {
   return await prisma.folder.findUnique({
     where: { name },
   });
 }
 
-export async function uploadFile(name, size, type, userId, folderId = null) {
+
+export async function uploadFile(name, size, type, userId, folderId = null, relativePath = null) {
   return await prisma.data.create({
-    data: {name, size, type, userId, folderId}
+    data: {name, size, type, userId, folderId, relativePath: relativePath || name}
   });
 }
+
 
 export async function deleteFile(id) {
   const file = await prisma.data.findUnique({
@@ -40,22 +43,25 @@ export async function deleteFile(id) {
     throw new Error('File not found');
   }
 
-  // Construct the correct file path
+   // Construct the correct file path based on whether it's in a folder
   let filePath;
-  if (file.folder) {
-    // File is in a folder
+  if (file.relativePath) {
+    // Use the stored relative path
+    filePath = path.join('uploads', file.relativePath);
+  } else if (file.folder) {
+    // Fallback: construct path from folder name + file name
     filePath = path.join('uploads', file.folder.name, file.name);
   } else {
     // File is in root uploads directory
     filePath = path.join('uploads', file.name);
   }
 
-  // Delete from disk
   await fs.unlink(filePath).catch((err) => {
+    // Optionally: log and continue even if file missing
     console.warn(`Could not delete file from disk: ${filePath}`, err);
   });
 
-  // Delete from DB
+  // 3. Delete from DB
   return await prisma.data.delete({
     where: { id },
   });
@@ -64,14 +70,14 @@ export async function deleteFile(id) {
 export async function deleteFolder(id) {
   const folder = await prisma.folder.findUnique({
     where: { id },
-    include: { data: true } // Include files to delete them first
+    include: { data: true }
   });
 
   if (!folder) {
     throw new Error('Folder not found');
   }
 
-  // Delete all files in the folder from the database first
+   // Delete all files in the folder from the database first
   await prisma.data.deleteMany({
     where: { folderId: id }
   });
@@ -84,17 +90,14 @@ export async function deleteFolder(id) {
     console.warn(`Could not delete folder from disk: ${folderPath}`, err);
   }
 
-  // Delete the folder from database
   return await prisma.folder.delete({
     where: { id },
   });
 }
 
 export async function displayFiles() {
-  // Only return files that are NOT in folders (root level files only)
   return await prisma.data.findMany({
-    where: { folderId: null }, // This is the key fix!
-    include: { folder: true }
+    include: { folder: true } // Include folder info for proper display
   });
 }
 

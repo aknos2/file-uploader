@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ('partials/head.ejs') %>
+<body>
+    <%- include ('partials/nav.ejs')%>
+
+  <main>
+    <div class="library-container">
+      <div class="content">
+        <div class="folder-head">
+          <a href="/library">←</a>
+          <h2>📁 <%= folder.name %></h2>
+        </div>
+        <% if (folderFiles.length === 0) { %>
+          <p>No files in this folder yet.</p>
+        <% } else { %>
+          <% folderFiles.forEach(file => { %>
+            <div class="card">
+              <ul>
+                <li><%= file.name %></li>
+                <li><%= file.size %></li>
+                <li><%= file.createdAt %></li>
+                <li><%= file.uploadedAt %></li>
+                <li><%= file.type %></li>
+              </ul>
+              <div class="tools">
+                <!-- same download/delete buttons -->
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+      <%- include('partials/sidebar.ejs') %>
+    </div>
+  </main>
+</body>
+</html>

@@ -22,6 +22,8 @@ model Data {
   name       String
   size       Int
   type       String   @default("file")
+  url        String?
+  path       String? // 🔁 for Supabase storage file path
   createdAt  DateTime @default(now())
   uploadedAt DateTime @default(now())
 

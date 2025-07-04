@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import fs from 'fs/promises';
 import path from 'path';
+import { supabase } from '../utils/supaBaseClient.js';
 
 export async function createFolder(name, userId) {
   const folder = await prisma.folder.create({
@@ -33,30 +34,16 @@ export async function uploadFile(name, size, type, userId, folderId = null) {
 }
 
 export async function deleteFile(id) {
-  const file = await prisma.data.findUnique({
-    where: { id },
-    include: { folder: true }
-  });
+  const file = await prisma.data.findUnique({ where: { id } });
+  if (!file) throw new Error('File not found');
 
-  if (!file) {
-    throw new Error('File not found');
-  }
+  await supabase.storage
+    .from(process.env.SUPABASE_BUCKET_NAME)
+    .remove([file.path]); // use saved path
 
-  let filePath;
-  if (file.folder) {
-    filePath = path.join('uploads', file.folder.name, file.name);
-  } else {
-    filePath = path.join('uploads', file.name);
-  }
-
-  await fs.unlink(filePath).catch((err) => {
-    console.warn(`Could not delete file from disk: ${filePath}`, err);
-  });
-
-  return await prisma.data.delete({
-    where: { id },
-  });
+  return await prisma.data.delete({ where: { id } });
 }
+
 
 export async function deleteFolder(id) {
   const folder = await prisma.folder.findUnique({
@@ -64,44 +51,58 @@ export async function deleteFolder(id) {
     include: { data: true }
   });
 
-  if (!folder) {
-    throw new Error('Folder not found');
+  if (!folder) throw new Error('Folder not found');
+
+  // 1. Delete files from Supabase Storage
+  const filePaths = folder.data.map(file => file.path).filter(Boolean);
+
+  if (filePaths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET_NAME)
+      .remove(filePaths);
+
+    if (storageError) console.warn('Failed to delete files from Supabase:', storageError);
   }
 
+  // 2. Delete metadata from DB
   await prisma.data.deleteMany({
     where: { folderId: id }
   });
 
-  const folderPath = path.join('uploads', folder.name); 
+  // 3. (optional) delete folder on disk if you're using local folders
+  const folderPath = path.join('uploads', folder.name);
   try {
     await fs.rm(folderPath, { recursive: true, force: true });
   } catch (err) {
     console.warn(`Could not delete folder from disk: ${folderPath}`, err);
   }
 
+  // 4. Delete folder metadata
   return await prisma.folder.delete({
     where: { id },
   });
 }
 
-export async function displayFiles() {
+
+export async function displayFiles(userId) {
   const files = await prisma.data.findMany({
-    where: { folderId: null },
+    where: { folderId: null, userId },
     include: { folder: true }
   });
   
   return files;
 }
 
-export async function foldersWithFiles() {
+export async function foldersWithFiles(userId) {
   return await prisma.folder.findMany({
+   where: { userId },
    include: { data: true },
   }); 
 }
 
-export async function viewFolder(folderId) {
+export async function viewFolder(folderId, userId) {
   const result = await prisma.folder.findUnique({
-    where: { id: folderId },
+    where: { id: folderId, userId },
     include: { data: true },
   });
   

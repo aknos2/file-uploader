@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { storage } from '../utils/multerStorage.js';
 import { deleteFileHandler, displayAllFilesHandler, uploadFileHandler, createFolderHandler, resolveFolderName, viewFolderHandler, deleteFolderHandler } from '../controllers/libraryController.js';
 import path from 'path';
 import { __dirname } from '../app.js';
 
-const upload = multer({ storage })
+const upload = multer({ storage: multer.memoryStorage() }); // 🧠 File stays in memory
 export const libraryRouter = Router();
 
 libraryRouter.get('/library', displayAllFilesHandler);
@@ -20,12 +19,3 @@ libraryRouter.post('/upload', upload.single('file'), resolveFolderName, uploadFi
 libraryRouter.post('/create-folder', createFolderHandler);
 libraryRouter.post('/:id/delete', deleteFileHandler);
 libraryRouter.post('/folder/:id/delete', deleteFolderHandler);
-libraryRouter.get('/download/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'uploads', req.params.filename);
-  res.download(filePath, err => {
-    if (err) {
-      console.error('File download error:', err);
-      return res.status(404).send('File not found');
-    }
-  });
-});

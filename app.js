@@ -1,10 +1,10 @@
 import express from 'express';
 import path from 'path';
 import expressSession from 'express-session';
-import pgSession from 'connect-pg-simple';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import prisma from './lib/prisma.js';
+
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { fileURLToPath } from 'url';
 import { indexRouter } from './routers/indexRouter.js';
@@ -26,6 +26,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
 app.use('/uploads', express.static('uploads'));
+app.use(express.json());
 
 // PostgreSQL + Prisma
 app.use(
@@ -73,5 +74,6 @@ app.use((err, req, res, next) => {
     return next(err); // delegate to default Express error handler
   }
 
-  res.status(err.statusCode || 500).send(err.message);
+  const status = Number(err.statusCode) || 500;
+  res.status(status).send(err.message || 'Something went wrong');
 });

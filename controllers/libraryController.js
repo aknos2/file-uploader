@@ -1,8 +1,12 @@
 import asyncHandler from 'express-async-handler';
-import path from 'path';
 import prisma from '../lib/prisma.js';
-import { createFolder, deleteFile, deleteFolder, displayFiles, foldersWithFiles, uploadFile, viewFolder } from '../services/libraryServices.js';
+import { v4 as uuid } from 'uuid';
+import { supabase } from '../utils/supaBaseClient.js';
+import { createFolder, deleteFile, deleteFolder, displayFiles, foldersWithFiles, viewFolder } from '../services/libraryServices.js';
 import { formatFileData, formatFolderData } from '../utils/formatFileData.js';
+import { fixDoubleUTF8Encoding } from '../utils/fixDoubleUTF8Encoding.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export async function resolveFolderName(req, res, next) {
   const folderId = req?.body?.folderId || req?.query?.folderId;
@@ -24,51 +28,97 @@ export async function resolveFolderName(req, res, next) {
     next(err);
   }
 }
-
-export const uploadFileHandler = asyncHandler(async(req, res) => {
-  if (!req.file) {
-   return res.status(400).render('library', {
-    errors: [{msg: 'No file uploaded'}]
-   })
-  }
-
-  const name = req.file.filename;
-  const size = req.file.size;
+ 
+export const uploadFileHandler = asyncHandler(async (req, res) => {
+  const { from, folderId } = req.body;
   const userId = req.user.id;
-  const { from } = req.body;
+  const file = req.file;
   
-  let folderId = req.body.folderId;
+  let originalName = file.originalname;
   
-  if (folderId === '' || folderId === 'undefined' || !folderId) {
-    folderId = null;
+  // Check if the filename looks like it has double UTF-8 encoding
+  if (/[À-ÿ]/.test(originalName)) {
+    originalName = fixDoubleUTF8Encoding(originalName);
   }
   
-  const ext = path.extname(name).slice(1);
-  const type = ext || "file";
-  
-  try {
-    await uploadFile(name, size, type, userId, folderId);
+  // Normalize to NFC (safe for most UTF-8 environments)
+  originalName = originalName.normalize('NFC');
 
-    if (from === 'folder' && folderId) {
-      return res.redirect(`/folder/${folderId}`);
+  // Create a safe filename by removing or replacing problematic characters
+  const safeFileName = originalName
+    .replace(/[^\w\-_.()[\]{}]/g, '_') // Replace non-ASCII and special chars with underscore
+    .replace(/_{2,}/g, '_') // Replace multiple underscores with single underscore
+    .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
+
+  // Ensure we have a valid filename
+  const finalFileName = safeFileName || 'unnamed_file';
+  
+  // Get file extension
+  const fileExtension = originalName.split('.').pop() || '';
+  const baseFileName = finalFileName.replace(/\.[^/.]+$/, ''); // Remove extension if present
+  
+  // Create safe file path with UUID prefix
+  const filePath = `${uuid()}-${baseFileName}${fileExtension ? '.' + fileExtension : ''}`;
+
+  // 1. Upload file
+  const { error: uploadError } = await supabase.storage
+    .from(process.env.SUPABASE_BUCKET_NAME)
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false,
+    });
+
+  if (uploadError) throw uploadError;
+
+  // 2. Generate signed URL (after upload)
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from(process.env.SUPABASE_BUCKET_NAME)
+    .createSignedUrl(filePath, 60); // 60 seconds
+
+  if (signedError) throw signedError;
+
+  // 3. Save to database (use the corrected original name)
+  await prisma.data.create({
+    data: {
+      name: originalName, // Now properly decoded Japanese characters
+      path: filePath,    // Use safe path for storage
+      size: file.size,
+      type: file.mimetype,
+      url: signedData.signedUrl,
+      folderId: folderId || null,
+      userId,
     }
+  });
 
-    res.redirect('/library');
-  } catch(err) {
-    console.error('Upload failed', err);
-    throw err;
-  }
+  res.redirect(from === 'folder' && folderId ? `/folder/${folderId}` : '/library');
 });
 
-export const displayAllFilesHandler = asyncHandler(async(req, res) => {
-  const allFiles = await displayFiles();
-  const allFolders = await foldersWithFiles();
-  
-  const formattedFiles = formatFileData(allFiles);
+export const displayAllFilesHandler = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const allFiles = await displayFiles(userId);
+  const allFolders = await foldersWithFiles(userId);
+
+  const formattedFiles = await Promise.all(
+    formatFileData(allFiles).map(async (file) => {
+      const { data: signedData, error } = await supabase.storage
+        .from(process.env.SUPABASE_BUCKET_NAME)
+        .createSignedUrl(file.path, 60); // expires in 60 seconds
+
+      return {
+        ...file,
+        url: signedData?.signedUrl || null 
+      };
+    })
+  );
+
   const formattedFolders = formatFolderData(allFolders);
-  
-  res.render('library', { allFolders: formattedFolders, allFiles: formattedFiles });
+
+  res.render('library', {
+    allFiles: formattedFiles,
+    allFolders: formattedFolders
+  });
 });
+
 
 export const deleteFileHandler = asyncHandler(async(req, res, next) => {
   try {
@@ -97,32 +147,53 @@ export const deleteFolderHandler = asyncHandler(async(req, res, next) => {
 });
 
 export const createFolderHandler = asyncHandler(async(req, res) => {
-  const name = req.body.folderName || `New folder`;
+  const baseName = req.body.folderName || `New folder`;
   const userId = req.user.id;
-  try {
-    await createFolder(name, userId);
-    res.redirect('/library');
-  } catch(err) {
-    console.error('Create folder failed', err);
-    throw err;
+
+  let folderName = baseName;
+  let counter = 1;
+  
+  // Keep trying until we find a unique name
+  while (true) {
+    try {
+      await createFolder(folderName, userId);
+      break;
+    } catch (error) {
+      // If it's a unique constraint error, try with a different name
+      if (error.code === 'P2002') {
+        counter++;
+        folderName = `${baseName} (${counter})`;
+      } else {
+        // If it's a different error, re-throw it
+        throw error;
+      }
+    }
   }
+  
+  res.redirect('/library');
 });
 
-export const viewFolderHandler = asyncHandler(async(req, res) => {
-  try {
-    const folderId = req.params.id;
-    
-    const folder = await viewFolder(folderId);
-    
-    if (!folder) {
-      return res.status(400).send('Folder not found');
-    }
-    
-    const folderFiles = formatFileData(folder.data);
+export const viewFolderHandler = asyncHandler(async (req, res) => {
+  const folderId = req.params.id;
+  const userId = req.user.id;
 
-    res.render('folder', { folder, folderFiles });
-  } catch(err) {
-    console.error('Error displaying folder', err);
-    throw err;
+  const folder = await viewFolder(folderId, userId);
+  if (!folder) {
+    return res.status(400).send('Folder not found');
   }
+
+  const folderFiles = await Promise.all(
+    formatFileData(folder.data).map(async (file) => {
+      const { data: signedData, error } = await supabase.storage
+        .from(process.env.SUPABASE_BUCKET_NAME)
+        .createSignedUrl(file.path, 60);
+
+      return {
+        ...file,
+        url: signedData?.signedUrl || null
+      };
+    })
+  );
+
+  res.render('folder', { folder, folderFiles });
 });

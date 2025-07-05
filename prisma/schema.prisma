@@ -25,7 +25,7 @@ model Data {
   url        String?
   path       String? // 🔁 for Supabase storage file path
   createdAt  DateTime @default(now())
-  uploadedAt DateTime @default(now())
+  uploadedAt DateTime @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -41,7 +41,7 @@ model Folder {
   name       String
   size       Int      @default(0)
   createdAt  DateTime @default(now())
-  uploadedAt DateTime @default(now())
+  uploadedAt DateTime @updatedAt
   type       String   @default("folder")
 
   userId String

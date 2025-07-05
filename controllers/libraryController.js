@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler';
 import prisma from '../lib/prisma.js';
 import { v4 as uuid } from 'uuid';
 import { supabase } from '../utils/supaBaseClient.js';
-import { createFolder, deleteFile, deleteFolder, displayFiles, foldersWithFiles, viewFolder } from '../services/libraryServices.js';
+import { createFolder, deleteFile, deleteFolder, displayFiles, editFileName, editFolderName, findFile, findFolder, foldersWithFiles, uniqueFolder, viewFolder } from '../services/libraryServices.js';
 import { formatFileData, formatFolderData } from '../utils/formatFileData.js';
 import { fixDoubleUTF8Encoding } from '../utils/fixDoubleUTF8Encoding.js';
 import dotenv from 'dotenv';
@@ -28,12 +28,13 @@ export async function resolveFolderName(req, res, next) {
     next(err);
   }
 }
- 
+
 export const uploadFileHandler = asyncHandler(async (req, res) => {
   const { from, folderId } = req.body;
   const userId = req.user.id;
   const file = req.file;
   
+  // Fix the double UTF-8 encoding issue
   let originalName = file.originalname;
   
   // Check if the filename looks like it has double UTF-8 encoding
@@ -196,4 +197,37 @@ export const viewFolderHandler = asyncHandler(async (req, res) => {
   );
 
   res.render('folder', { folder, folderFiles });
+});
+
+export const editFileNameHandler = asyncHandler(async(req, res) => {
+  const fileId = req.params.id;
+  const fileName = req.body.name;
+  const userId = req.user.id;
+
+  if (!fileId) return res.status(400).json({ error: 'File ID is required'});
+
+  const file = await findFile(fileId, userId);
+  if (!file) return res.status(400).json({ error: 'File not found '});
+
+  const updatedFile = await editFileName(fileId, fileName.trim(), userId)
+  
+  res.json({ success: true, file: updatedFile });
+});
+
+export const editFolderNameHandler = asyncHandler(async(req, res) => {
+  const folderId = req.params.id;
+  const folderName = req.body.name;
+  const userId = req.user.id;
+
+  if (!folder) return res.status(400).json({ error: 'File ID is required'});
+
+  const folder = await findFolder(folderId, userId);
+  if (!file) return res.status(400).json({ error: 'Folder not found '});
+
+  const existingFolder = uniqueFolder(folderName, userId, folderId);
+  if (existingFolder) return res.status(400).json({ error: 'Folder name already exists' });
+
+  const updatedFolder = await editFolderName(fileId, fileName.trim(), userId)
+  
+  res.json({ success: true, folder: updatedFolder });
 });

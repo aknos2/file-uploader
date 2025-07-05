@@ -8,7 +8,7 @@
   <main>
     <div class="library-container">      
       <div class="content">
-        <% if (locals.user && allFiles.length > 0) {%>
+        <% if (locals.user && (allFiles.length > 0 || allFolders.length > 0)) { %>
           <div class="card category">
             <ul>
                 <li id="name">Name</li>
@@ -18,19 +18,33 @@
                 <li id="type">Type</li>
               </ul>
           </div>
+          <!-- Rename File Modal -->
+          <div id="editFileNameOverlay" class="modal-overlay hidden">
+            <div class="modal-window">
+              <h2>Rename file</h2>
+              <form id="editFileNameForm">
+                <input type="text" name="fileName" id="modalFileName" placeholder="File name" required />
+                <div class="modal-actions">
+                  <button type="submit">Rename</button>
+                  <button type="button" onclick="closeFileNameModal()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <% allFiles.forEach((file) => { %> 
-            <div class="card">
+            <div class="card" data-file-id="<%= file.id %>">
               <ul>
-                <li><%= file.name %></li>
+                <li class="file-name"><%= file.name %></li>
                 <li><%= file.size %></li>
                 <li><%= file.createdAt %></li>
                 <li><%= file.uploadedAt %></li>
                 <li><%= file.type %></li>
               </ul>
               <div class="tools">
-                <button>
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>              
-                </button>
+                  <button type="button" onclick="openFileNameModal('<%= file.id %>', '<%= file.name %>')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>              
+                  </button>
                  <a href="<%= file.url %>" target="_blank" rel="noopener noreferrer">
                   <button>
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
@@ -45,13 +59,12 @@
               </div>
             </div>
           <% }) %>
-        <% } %>
-         <% if (locals.user && allFolders.length > 0) {%> 
+      
           <% allFolders.forEach(folder => { %>
           <a href="/folder/<%= folder.id %>" class="folder-link">
             <div class="card folder-item" data-folder-id="<%= folder.id %>">
               <ul>
-                  <li><%= folder.name %>
+                  <li>📁 <%= folder.name %>
                     <span>Files:<%= folder.data.length %></span>
                   </li>
                   <li><%= folder.size %></li>
@@ -59,7 +72,6 @@
                   <li><%= folder.uploadedAt %></li>
                   <li><%= folder.type %></li>
                 </ul>
-            
                 <div class="tools">
                   <div class="tools">
                     <button>
@@ -81,9 +93,58 @@
           </a>  
           <% }) %>
         <% } %>
+        <% if (locals.user && allFiles.length === 0 && allFolders.length === 0) {%>
+          <p>No files uploaded yet.</p>
+        <% } %>
       </div>
        <%- include ('partials/sidebar.ejs') %>
     </div>
   </main>
+
+  <script>
+    let currentEditingFileId = null;
+
+    function openFileNameModal(fileId, currentName) {
+      currentEditingFileId = fileId;
+      document.getElementById('modalFileName').value = currentName;
+      document.getElementById('editFileNameOverlay').classList.remove('hidden');
+      document.getElementById('modalFileName').focus();
+    }
+
+    function closeFileNameModal() {
+      currentEditingFileId = null;
+      document.getElementById('modalFileName').value = "";
+      document.getElementById('editFileNameOverlay').classList.add('hidden');
+    }
+
+    document.getElementById('editFileNameForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newName = document.getElementById('modalFileName').value.trim();
+      if (!newName) return alert("File name cannot be empty");
+
+      try {
+        const res = await fetch(`/${currentEditingFileId}/edit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          location.reload();
+        } else {
+          alert(data.error || "Rename failed");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong");
+      }
+    });
+    
+    window.addEventListener('keydown', function (e) {
+      if (e.key === "Escape") closeFileNameModal();
+    });
+  </script>
 </body>
 </html>

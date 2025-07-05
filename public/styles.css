@@ -256,7 +256,6 @@ nav p, nav a{
   justify-content: center;
   z-index: 999;
 }
-
 .modal-window {
   background: white;
   padding: 2rem;
@@ -264,22 +263,23 @@ nav p, nav a{
   width: 300px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
-
 .modal-window h2 {
   margin-top: 0;
   font-size: 1.2rem;
 }
-
 .modal-window input {
   width: 100%;
   padding: 0.5rem;
   margin: 1rem 0;
 }
-
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  color: #000000;
+}
+.modal-actions button{
+  color: #000000;
 }
 
 .hidden {

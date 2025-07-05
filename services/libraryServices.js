@@ -19,12 +19,6 @@ export async function createFolder(name, userId) {
   return folder;
 }
 
-export async function findFolderByName(name) {
-  return await prisma.folder.findUnique({
-    where: { name },
-  });
-}
-
 export async function uploadFile(name, size, type, userId, folderId = null) {
   const result = await prisma.data.create({
     data: {name, size, type, userId, folderId}
@@ -107,4 +101,33 @@ export async function viewFolder(folderId, userId) {
   });
   
   return result;
+}
+
+export async function editFileName(fileId, name, userId) {
+  return await prisma.data.update({
+    where: { id: fileId, userId },
+    data: { name },
+  });
+}
+export async function editFolderName(folderId, name, userId) {
+  return await prisma.folder.update({
+    where: { id: folderId, userId },
+    data: { name },
+  });
+}
+export async function findFile (fileId, userId) {
+  return await prisma.data.findFirst({
+    where: { id: fileId, userId },
+  });
+}
+export async function findFolder (folderId, userId) {
+  return await prisma.folder.findFirst({
+    where: { id: folderId, userId },
+  });
+}
+export async function uniqueFolder(name, userId, folderId) {
+  return await prisma.folder.findFirst({
+    where: {name: name.trim(), userId},
+    id: {not: folderId}
+  })
 }

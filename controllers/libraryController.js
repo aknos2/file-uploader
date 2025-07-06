@@ -150,7 +150,7 @@ export const deleteFolderHandler = asyncHandler(async(req, res, next) => {
 export const createFolderHandler = asyncHandler(async(req, res) => {
   const baseName = req.body.folderName || `New folder`;
   const userId = req.user.id;
-
+  
   let folderName = baseName;
   let counter = 1;
   
@@ -219,15 +219,13 @@ export const editFolderNameHandler = asyncHandler(async(req, res) => {
   const folderName = req.body.name;
   const userId = req.user.id;
 
-  if (!folder) return res.status(400).json({ error: 'File ID is required'});
+  const folder = await findFolder(folderId, userId); 
+  if (!folder) return res.status(400).json({ error: 'Folder not found' });
 
-  const folder = await findFolder(folderId, userId);
-  if (!file) return res.status(400).json({ error: 'Folder not found '});
-
-  const existingFolder = uniqueFolder(folderName, userId, folderId);
+  const existingFolder = await uniqueFolder(folderName, userId, folderId); 
   if (existingFolder) return res.status(400).json({ error: 'Folder name already exists' });
 
-  const updatedFolder = await editFolderName(fileId, fileName.trim(), userId)
+  const updatedFolder = await editFolderName(folderId, folderName.trim(), userId); 
   
   res.json({ success: true, folder: updatedFolder });
 });

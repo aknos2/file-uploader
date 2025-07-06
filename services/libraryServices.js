@@ -4,19 +4,9 @@ import path from 'path';
 import { supabase } from '../utils/supaBaseClient.js';
 
 export async function createFolder(name, userId) {
-  const folder = await prisma.folder.create({
+  return await prisma.folder.create({
     data: { name, userId },
   });
-
-  const folderPath = path.join('uploads', name);
-
-  try {
-    await fs.mkdir(folderPath, { recursive: true });
-  } catch (err) {
-    console.error('Failed to create physical folder:', err);
-  }
-
-  return folder;
 }
 
 export async function uploadFile(name, size, type, userId, folderId = null) {
@@ -127,7 +117,6 @@ export async function findFolder (folderId, userId) {
 }
 export async function uniqueFolder(name, userId, folderId) {
   return await prisma.folder.findFirst({
-    where: {name: name.trim(), userId},
-    id: {not: folderId}
+    where: {name: name.trim(), userId, id: {not: folderId}},
   })
 }

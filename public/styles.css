@@ -164,6 +164,18 @@ nav p, nav a{
 .folder-link:hover {
   background-color: #965656;
 }
+.library-container .folder-name {
+  position: relative;
+}
+.library-container .folder-name span {
+  position: absolute;
+  left: 0;
+  transform: translate(10px, 5px);
+  background-color: red;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.7rem;
+}
 
 .error {
   margin-top: 10px;
@@ -208,10 +220,17 @@ nav p, nav a{
   overflow: auto;
 }
 .card.category {
+  display: flex;
   background-color: rgb(170, 180, 105);
   border-top: 1px solid black;
   border-radius: 5px 5px 0 0;
   font-weight: 550;
+}
+.card.category button {
+  background: transparent;
+  font-family: inherit;
+  color: #000000;
+  font-size: 1rem;
 }
 .card ul{
   display: grid;
@@ -238,6 +257,7 @@ nav p, nav a{
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px;
 }
 .folder-head a{
   font-size: 1.5rem;
@@ -280,6 +300,11 @@ nav p, nav a{
 }
 .modal-actions button{
   color: #000000;
+}
+
+.no-files {
+  margin: 10px;
+  text-align: center;
 }
 
 .hidden {

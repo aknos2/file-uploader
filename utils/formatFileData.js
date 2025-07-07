@@ -13,10 +13,12 @@ export function formatFileData(data) {
         createdDaysAgo <= 3
           ? `${createdDaysAgo === 0 ? 'Today' : `${createdDaysAgo} day${createdDaysAgo > 1 ? 's' : ''} ago`}`
           : format(createdAtDate, 'MMM dd, yyyy'),
+      createdAtRaw: createdAtDate.toISOString(),
       uploadedAt:
         uploadedDaysAgo <= 3
           ? formatDistanceToNow(uploadedAtDate, { addSuffix: true }) 
           : format(uploadedAtDate, 'MMM dd, yyyy'),
+      uploadedAtRaw: uploadedAtDate.toISOString(),
       size: formatFileSize(file.size),
     };
   });
@@ -28,6 +30,7 @@ export function formatFolderData(folders) {
     const uploadedAtDate = new Date(folder.uploadedAt || folder.createdAt);
     const createdDaysAgo = differenceInCalendarDays(new Date(), createdAtDate);
     const uploadedDaysAgo = differenceInDays(new Date(), uploadedAtDate);
+    const totalSize = calculateFolderSize(folder.data);
 
     return {
       ...folder,
@@ -35,18 +38,24 @@ export function formatFolderData(folders) {
         createdDaysAgo <= 3
           ? `${createdDaysAgo === 0 ? 'Today' : `${createdDaysAgo} day${createdDaysAgo > 1 ? 's' : ''} ago`}`
           : format(createdAtDate, 'MMM dd, yyyy'),
+      createdAtRaw: createdAtDate.toISOString(),
       uploadedAt:
         uploadedDaysAgo <= 3
           ? formatDistanceToNow(uploadedAtDate, { addSuffix: true }) 
           : format(uploadedAtDate, 'MMM dd, yyyy'),
-      size: formatFileSize(folder.size),
+      uploadedAtRaw: uploadedAtDate.toISOString(),
+      size: formatFileSize(totalSize),
 
       // format files inside the folder
-      data: formatFileData(folder.data || [])
+      data: formatFileData(folder.data || []),
+      totalSize: totalSize,
     };
   });
 }
 
+function calculateFolderSize(files) {
+  return files.reduce((total, file) => total + (file.size || 0), 0);
+} 
 
 function formatFileSize(bytes) {
   const kb = bytes / 1024;

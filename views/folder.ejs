@@ -21,6 +21,19 @@
               <li><button type="button" onclick="sortBy('type')">Type</button></li>
             </ul>
           </div>
+           <!-- Rename File Modal -->
+          <div id="editFileNameOverlay" class="modal-overlay hidden">
+            <div class="modal-window">
+              <h2>Rename file</h2>
+              <form id="editFileNameForm">
+                <input type="text" name="fileName" id="modalFileName" placeholder="File name" required />
+                <div class="modal-actions">
+                  <button type="submit">Rename</button>
+                  <button type="button" onclick="closeFileNameModal()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
           <div id="itemList">
         <% if (folderFiles.length === 0) { %>
           <p class="no-files">No files in this folder.</p>

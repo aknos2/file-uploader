@@ -28,3 +28,12 @@ function sortBy(key) {
 
   items.forEach(item => container.appendChild(item));
 }
+
+document.querySelectorAll('.folder-link ul').forEach(ul => {
+  ul.addEventListener('mouseenter', () => {
+    ul.closest('.folder-item')?.classList.add('hovered');
+  });
+  ul.addEventListener('mouseleave', () => {
+    ul.closest('.folder-item')?.classList.remove('hovered');
+  });
+});

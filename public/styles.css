@@ -1,5 +1,12 @@
 :root {
   --accessBtnColor: rgb(73, 73, 213);
+  --main-background: rgba(212, 224, 230, 0.393);
+  --header-background: rgba(194, 219, 219, 0.9);
+  --body-background: #ececec;
+  --sidebar-background: #ececec;
+  --card-category-background: rgb(194, 192, 134);
+  --card-background: #fdfdfd;
+  --signup-background: rgba(221, 235, 235, 0.9);
 }
 
 * {
@@ -7,7 +14,8 @@
 }
 
 body {
-  margin: 20px auto 0px auto;
+  margin: 0 auto 20px auto;
+  background-color: var(--body-background);
 }
 
 p, h1, h2, h3, a, ul {
@@ -28,6 +36,10 @@ button {
   margin: 0 auto;
 }
 
+main {
+   background-color: var(--main-background)
+}
+
 nav {
   display: flex;
   flex-direction: column;
@@ -37,22 +49,45 @@ nav {
   position: relative;
   padding: 0 20px;
   max-height: 10vh;
+  padding-top: 20px;
   padding-bottom: 10px;
+  background-color: var(--header-background)
 }
-
+nav .logo {
+  font-size: 1.4rem;
+}
 nav ul {
   display: flex;
   justify-content: flex-end;
   gap: 20px;
 }
-
 nav li{
   list-style-type: none;
 }
-
 nav p, nav a{
   color: #000000;
   font-weight: 300;
+}
+
+.username {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+.material-symbols-outlined {
+  color: #252121;
+}
+.library-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.3rem;
+}
+.library-link p{
+  display: flex;
+  align-items: center;
 }
 
 .centering-wrapper {
@@ -62,6 +97,44 @@ nav p, nav a{
   align-items: center;
 }
 
+.index-container {
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  text-align: center;
+}
+.index-container .title{
+  padding: 20px;
+}
+.index-container .description {
+  margin-top: 10px;
+}
+.index-container .get-started {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.index-container .get-started p:first-child{
+  color: whitesmoke;
+  background-color: #475f7a;
+  margin-bottom: 5px;
+  padding: 10px 0;
+}
+.index-container .get-started a {
+  border: 1.5px solid black;
+  border-radius: 5px;
+  width: fit-content;
+  padding: 5px;
+  background-color: #cbbc58;
+  width: 150px;
+}
+.index-container .enter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .login-container, 
 .signup-container {
   border: 1px solid black;
@@ -69,6 +142,7 @@ nav p, nav a{
   width: 450px;
   padding: 30px 70px;
   margin: 0 auto;
+  background-color: var(--signup-background);
 }
 .login-container h1, 
 .signup-container h1 {
@@ -133,15 +207,26 @@ nav p, nav a{
   max-width: 200px;
   position: relative;
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: var(--sidebar-background);
   color: #000000;
 }
 .library-container .sidebar button {
   color: #000000;
+  border: 1px solid transparent;
+}
+.library-container .file-btn {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  width: 50px;
 }
 .library-container .sidebar svg {
   width: 80px;
-  height: 30px
+  height: 30px;
+}
+.library-container .sidebar button:hover, .file-btn:hover, .logout:hover {
+  cursor: pointer;
+  background-color: #ddedea;
+  border: 1px solid black;
 }
 .library-container .sidebar .logout {
   position: absolute;
@@ -194,23 +279,6 @@ nav p, nav a{
   padding-top: 10px;
 }
 
-.username {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-}
-.material-symbols-outlined {
-  color: #252121;
-}
-.library-link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.library-link p{
-  display: flex;
-  align-items: center;
-}
 
 .card {
   border-bottom: 1px solid black;
@@ -218,10 +286,10 @@ nav p, nav a{
   border-right: 1px solid black;
   padding: 10px 10px ;
   overflow: auto;
+  background-color: var(--card-background);
 }
 .card.category {
-  display: flex;
-  background-color: rgb(170, 180, 105);
+  background-color: var(--card-category-background);
   border-top: 1px solid black;
   border-radius: 5px 5px 0 0;
   font-weight: 550;
@@ -230,7 +298,12 @@ nav p, nav a{
   background: transparent;
   font-family: inherit;
   color: #000000;
-  font-size: 1rem;
+  font-size: 1.2rem;
+}
+.card.category button:hover {
+  cursor: pointer;
+  border: 1px solid black;
+  background-color: #c39252;
 }
 .card ul{
   display: grid;
@@ -239,19 +312,32 @@ nav p, nav a{
 .card li {
   list-style-type: none;
 }
-.card button {
-  cursor: pointer;
-  height: 25px;
-}
 .card svg {
   width: 20px;
 }
 .card .tools {
   display: flex;
+  gap: 5px;
+}
+.card .tools button {
+  cursor: pointer;
+  height: 25px;
+  border: 1px solid black;
+}
+.card .tools button:hover {
+  background-color: #6aaffa;
 }
 .card .tools .delete-btn {
   margin-right: auto;
 }
+.card .folder-name, .file-name {
+  margin-bottom: 5px;
+}
+.folder-item.hovered {
+  background-color: #fafaa6;
+  transition: background-color 0.2s ease;
+}
+
 
 .folder-head {
   display: flex;

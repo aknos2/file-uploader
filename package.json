@@ -4,7 +4,7 @@
   "description": "Create a file uploader website. Odin Project",
   "main": "index.js",
   "scripts": {
-    "start": "npx prisma migrate deploy && node app.js"
+    "start": "npx prisma migrate resolve --applied 0_init && node app.js"
   },
   "type": "module",
   "repository": {

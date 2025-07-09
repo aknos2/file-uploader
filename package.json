@@ -4,8 +4,7 @@
   "description": "Create a file uploader website. Odin Project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch app.js"
+    "start": "npx prisma migrate deploy && node app.js"
   },
   "type": "module",
   "repository": {

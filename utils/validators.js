@@ -27,4 +27,12 @@ export const validateUserRegistration = [
     .isLength({ min: 6, max: 30 }).withMessage('Password must be between 6 and 30 characters')
     .matches(/\d/).withMessage('Password must contain at least one number')
     .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter'),
+
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+  }),
 ];

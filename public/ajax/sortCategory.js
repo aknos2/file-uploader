@@ -2,7 +2,7 @@ let currentSort = { key: null, ascending: true };
 
 function sortBy(key) {
   const container = document.getElementById('itemList');
-  const items = Array.from(container.querySelectorAll('.card'));
+  const items = Array.from(container.querySelectorAll('.card:not(.category)'));
 
   if (currentSort.key === key) {
     currentSort.ascending = !currentSort.ascending;

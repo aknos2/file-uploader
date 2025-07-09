@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import prisma from '../lib/prisma.js';
 import { v4 as uuid } from 'uuid';
-import { supabase } from '../utils/supaBaseClient.js';
+import { supabase } from '../utils/supabaseClient.js';
 import { createFolder, deleteFile, deleteFolder, displayFiles, editFileName, editFolderName, findFile, findFolder, foldersWithFiles, uniqueFolder, viewFolder } from '../services/libraryServices.js';
 import { formatFileData, formatFolderData } from '../utils/formatFileData.js';
 import { fixDoubleUTF8Encoding } from '../utils/fixDoubleUTF8Encoding.js';

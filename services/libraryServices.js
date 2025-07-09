@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import fs from 'fs/promises';
 import path from 'path';
-import { supabase } from '../utils/supaBaseClient.js';
+import { supabase } from '../utils/supabaseClient.js';
 
 export async function createFolder(name, userId) {
   return await prisma.folder.create({

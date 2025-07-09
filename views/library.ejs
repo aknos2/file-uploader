@@ -9,15 +9,7 @@
     <div class="library-container">      
       <div class="content">
         <% if (locals.user && (allFiles.length > 0 || allFolders.length > 0)) { %>
-          <div class="card category">
-            <ul>
-              <li><button type="button" onclick="sortBy('name')">Name</button></li>
-              <li><button type="button" onclick="sortBy('size')">Size</button></li>
-              <li><button type="button" onclick="sortBy('createdat')">Created</button></li>
-              <li><button type="button" onclick="sortBy('uploadedat')">Modified</button></li>
-              <li><button type="button" onclick="sortBy('type')">Type</button></li>
-            </ul>
-          </div>
+          
           <!-- Rename File Modal -->
           <div id="editFileNameOverlay" class="modal-overlay hidden">
             <div class="modal-window">
@@ -45,7 +37,16 @@
             </div>
           </div>
 
-          <div id="itemList">
+          <div id="itemList" class="wrap">
+            <div class="card category">
+            <ul>
+              <li><button type="button" onclick="sortBy('name')">Name</button></li>
+              <li><button type="button" onclick="sortBy('size')">Size</button></li>
+              <li><button type="button" onclick="sortBy('createdat')">Created</button></li>
+              <li><button type="button" onclick="sortBy('uploadedat')">Modified</button></li>
+              <li><button type="button" onclick="sortBy('type')">Type</button></li>
+            </ul>
+          </div>
             <% allFolders.forEach(folder => { %>
               <div class="card folder-item"
                    data-name="<%= folder.name %>"

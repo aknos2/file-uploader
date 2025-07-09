@@ -399,6 +399,22 @@ nav p, nav a{
 
 
 @media (max-width: 878px) {
+  .card,
+  .card.category {
+    flex: 0 0 auto;
+    min-width: 1000px;
+  }
+  #itemList {
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+
+    padding-bottom: 1rem;
+  }
+  nav {
+    max-height: 15vh;
+  }
   .card ul {
     display: grid;
     grid-template-columns: minmax(150px, 2fr) minmax(80px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(60px, 0.5fr);

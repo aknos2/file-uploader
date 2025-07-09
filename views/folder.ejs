@@ -12,15 +12,6 @@
           <h2>📁 <%= folder.name %></h2>
           <p>(<%= folder.data.length %> <%= folder.data.length > 1 ? 'files' : 'file'%>)</p>
         </div>
-          <div class="card category">
-            <ul>
-              <li><button type="button" onclick="sortBy('name')">Name</button></li>
-              <li><button type="button" onclick="sortBy('size')">Size</button></li>
-              <li><button type="button" onclick="sortBy('createdat')">Created</button></li>
-              <li><button type="button" onclick="sortBy('uploadedat')">Modified</button></li>
-              <li><button type="button" onclick="sortBy('type')">Type</button></li>
-            </ul>
-          </div>
            <!-- Rename File Modal -->
           <div id="editFileNameOverlay" class="modal-overlay hidden">
             <div class="modal-window">
@@ -35,6 +26,15 @@
             </div>
           </div>
           <div id="itemList">
+            <div class="card category">
+              <ul>
+                <li><button type="button" onclick="sortBy('name')">Name</button></li>
+                <li><button type="button" onclick="sortBy('size')">Size</button></li>
+                <li><button type="button" onclick="sortBy('createdat')">Created</button></li>
+                <li><button type="button" onclick="sortBy('uploadedat')">Modified</button></li>
+                <li><button type="button" onclick="sortBy('type')">Type</button></li>
+              </ul>
+            </div>
         <% if (folderFiles.length === 0) { %>
           <p class="no-files">No files in this folder.</p>
         <% } else { %>
